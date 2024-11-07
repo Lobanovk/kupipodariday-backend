@@ -1,14 +1,15 @@
 import { Module } from '@nestjs/common';
-import { AppController } from './app.controller';
-import { UsersModule } from './users/users.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { WishesModule } from './wishes/wishes.module';
-import { WishlistsModule } from './wishlists/wishlists.module';
-import { OffersModule } from './offers/offers.module';
-import { User } from './users/entities/user.entity';
-import { Offer } from './offers/entities/offer.entity';
-import { Wish } from './wishes/entities/wish.entity';
-import { Wishlist } from './wishlists/entities/wishlist.entity';
+import { AppController } from './app.controller';
+import { User } from './modules/users/entities/user.entity';
+import { Offer } from './modules/offers/entities/offer.entity';
+import { Wish } from './modules/wishes/entities/wish.entity';
+import { Wishlist } from './modules/wishlists/entities/wishlist.entity';
+import { WishesModule } from './modules/wishes/wishes.module';
+import { WishlistsModule } from './modules/wishlists/wishlists.module';
+import { OffersModule } from './modules/offers/offers.module';
+import { UsersModule } from './modules/users/users.module';
+import { AuthModule } from './modules/auth/auth.module';
 
 @Module({
   imports: [
@@ -22,10 +23,11 @@ import { Wishlist } from './wishlists/entities/wishlist.entity';
       entities: [User, Offer, Wish, Wishlist],
       synchronize: true,
     }),
-    UsersModule,
     WishesModule,
     WishlistsModule,
     OffersModule,
+    UsersModule,
+    AuthModule,
   ],
   controllers: [AppController],
   providers: [],
