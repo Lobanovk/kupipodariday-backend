@@ -1,5 +1,5 @@
 import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
-import { Length } from 'class-validator';
+import { IsOptional, IsUrl, Length } from 'class-validator';
 
 @Entity()
 export class User {
@@ -10,12 +10,15 @@ export class User {
   @Length(2, 30)
   username: string;
 
-  @Column('char', { default: true })
+  @Column()
+  @IsOptional()
   @Length(2, 200)
-  about = 'Пока ничего не рассказал о себе';
+  about: string;
 
-  @Column('char', { default: true })
-  avatar = 'https://i.pravatar.cc/300';
+  @Column()
+  @IsOptional()
+  @IsUrl()
+  avatar: string;
 
   @Column({ unique: true })
   email: string;

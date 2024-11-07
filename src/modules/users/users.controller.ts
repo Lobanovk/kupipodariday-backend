@@ -1,16 +1,5 @@
-import {
-  Controller,
-  Get,
-  Post,
-  Body,
-  Patch,
-  Param,
-  Delete,
-} from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param } from '@nestjs/common';
 import { UsersService } from './users.service';
-import { CreateUserDto } from './dto/create-user.dto';
-import { UpdateUserDto } from './dto/update-user.dto';
-import { FindUserDto } from './dto/find-user.dto';
 
 @Controller('users')
 export class UsersController {
@@ -22,7 +11,7 @@ export class UsersController {
   }
 
   @Patch('me')
-  updateMe(@Body() updateUserDto: UpdateUserDto) {
+  updateMe(@Body() updateUserDto: any) {
     console.log('Обновить и вернуть информацию о пользаке', updateUserDto);
   }
 
@@ -42,7 +31,7 @@ export class UsersController {
   }
 
   @Post('find')
-  create(@Body() findUserDto: FindUserDto) {
+  create(@Body() findUserDto: any) {
     console.log('find user ', findUserDto);
   }
 }
