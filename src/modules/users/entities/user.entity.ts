@@ -2,15 +2,14 @@ import {
   Column,
   CreateDateColumn,
   Entity,
-  JoinTable,
   OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
 import { IsOptional, IsUrl, Length } from 'class-validator';
-import { Wish } from '../../wishes/entities/wish.entity';
-import { Wishlist } from '../../wishlists/entities/wishlist.entity';
-import { Offer } from '../../offers/entities/offer.entity';
+import { Wish } from 'src/modules/wishes/entities/wish.entity';
+import { Wishlist } from 'src/modules/wishlists/entities/wishlist.entity';
+import { Offer } from 'src/modules/offers/entities/offer.entity';
 
 @Entity()
 export class User {

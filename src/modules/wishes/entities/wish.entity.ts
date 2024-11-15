@@ -9,9 +9,9 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 import { IsUrl, Length } from 'class-validator';
-import { User } from '../../users/entities/user.entity';
-import { Wishlist } from '../../wishlists/entities/wishlist.entity';
-import { Offer } from '../../offers/entities/offer.entity';
+import { User } from 'src/modules/users/entities/user.entity';
+import { Wishlist } from 'src/modules/wishlists/entities/wishlist.entity';
+import { Offer } from 'src/modules/offers/entities/offer.entity';
 
 @Entity()
 export class Wish {

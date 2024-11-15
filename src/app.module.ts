@@ -1,15 +1,15 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { AppController } from './app.controller';
-import { User } from './modules/users/entities/user.entity';
-import { Offer } from './modules/offers/entities/offer.entity';
-import { Wish } from './modules/wishes/entities/wish.entity';
-import { Wishlist } from './modules/wishlists/entities/wishlist.entity';
-import { WishesModule } from './modules/wishes/wishes.module';
-import { WishlistsModule } from './modules/wishlists/wishlists.module';
-import { OffersModule } from './modules/offers/offers.module';
-import { UsersModule } from './modules/users/users.module';
-import { AuthModule } from './modules/auth/auth.module';
+import { AppController } from 'src/app.controller';
+import { User } from 'src/modules/users/entities/user.entity';
+import { Offer } from 'src/modules/offers/entities/offer.entity';
+import { Wish } from 'src/modules/wishes/entities/wish.entity';
+import { Wishlist } from 'src/modules/wishlists/entities/wishlist.entity';
+import { WishesModule } from 'src/modules/wishes/wishes.module';
+import { WishlistsModule } from 'src/modules/wishlists/wishlists.module';
+import { OffersModule } from 'src/modules/offers/offers.module';
+import { UsersModule } from 'src/modules/users/users.module';
+import { AuthModule } from 'src/modules/auth/auth.module';
 
 @Module({
   imports: [

@@ -8,7 +8,7 @@ import {
   ValidateNested,
 } from 'class-validator';
 import { Type } from 'class-transformer';
-import { Wish } from '../../wishes/entities/wish.entity';
+import { Wish } from 'src/modules/wishes/entities/wish.entity';
 
 export class UpdateWishlistDto {
   @IsString()

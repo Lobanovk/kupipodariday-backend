@@ -9,8 +9,8 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 import { IsUrl, Length, Max } from 'class-validator';
-import { Wish } from '../../wishes/entities/wish.entity';
-import { User } from '../../users/entities/user.entity';
+import { Wish } from 'src/modules/wishes/entities/wish.entity';
+import { User } from 'src/modules/users/entities/user.entity';
 
 @Entity()
 export class Wishlist {

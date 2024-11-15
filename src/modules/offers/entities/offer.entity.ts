@@ -6,8 +6,8 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
-import { User } from '../../users/entities/user.entity';
-import { Wish } from '../../wishes/entities/wish.entity';
+import { User } from 'src/modules/users/entities/user.entity';
+import { Wish } from 'src/modules/wishes/entities/wish.entity';
 
 @Entity()
 export class Offer {

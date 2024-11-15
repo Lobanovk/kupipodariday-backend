@@ -1,9 +1,9 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { FindManyOptions, Repository } from 'typeorm';
-import { Wish } from './entities/wish.entity';
-import { CreateWishDto } from './dto/create-wish.dto';
-import { UpdateWishDto } from './dto/update-wish.dto';
+import { Wish } from 'src/modules/wishes/entities/wish.entity';
+import { CreateWishDto } from 'src/modules/wishes/dto/create-wish.dto';
+import { UpdateWishDto } from 'src/modules/wishes/dto/update-wish.dto';
 
 @Injectable()
 export class WishesService {
@@ -22,16 +22,21 @@ export class WishesService {
   }
 
   async update(id: Wish['id'], updateWishDto: UpdateWishDto) {
+    /** TODO проверка на пользака и невозможность менять стоимость при offers.length > 0
+     * нет возможности менять raised руками, только исходя из общий заявок - сделать это в offers
+     * **/
     await this.wishRepository.update(id, updateWishDto);
 
     return await this.wishRepository.findOneBy({ id });
   }
 
   async removeOne(id: Wish['id']) {
+    // TODO удаляешь только свои подарки
     return await this.wishRepository.delete(id);
   }
 
-  async copyOne(id: Wish['id'], ownerId: Wish['owner']) {
+  async copyOne(id: Wish['id'], owner: Wish['owner']) {
+    // TODO проверка на пользака, нельзя копировать свое же
     const wish = await this.wishRepository.findOne({
       where: { id },
       select: {
@@ -55,7 +60,7 @@ export class WishesService {
       copied: Number(wish.copied) + 1,
     });
 
-    return await this.create({ ...wish, owner: ownerId });
+    return await this.create({ ...wish, owner: owner });
   }
 
   async findLastCreated() {

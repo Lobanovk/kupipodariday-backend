@@ -1,10 +1,10 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { Offer } from './entities/offer.entity';
-import { CreateOfferDto } from './dto/create-offer.dto';
-import { Wish } from '../wishes/entities/wish.entity';
-import { User } from '../users/entities/user.entity';
+import { Offer } from 'src/modules/offers/entities/offer.entity';
+import { CreateOfferDto } from 'src/modules/offers/dto/create-offer.dto';
+import { Wish } from 'src/modules/wishes/entities/wish.entity';
+import { User } from 'src/modules/users/entities/user.entity';
 
 @Injectable()
 export class OffersService {
@@ -16,6 +16,9 @@ export class OffersService {
   ) {}
 
   async create({ offer, user }: { offer: CreateOfferDto; user: User }) {
+    // TODO проверка на то, что собранная будет меньше чем после создания заявки
+    // TODO на свои подарки нельзя скидыватся
+
     const currentWish = await this.wishRepository.findOneBy({
       id: offer.itemId,
     });

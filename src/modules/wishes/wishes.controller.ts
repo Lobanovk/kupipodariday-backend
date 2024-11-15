@@ -9,10 +9,10 @@ import {
   Req,
   UseGuards,
 } from '@nestjs/common';
-import { WishesService } from './wishes.service';
-import { JwtGuard } from '../../guards/jwt.guard';
-import { CreateWishDto } from './dto/create-wish.dto';
-import { UpdateWishDto } from './dto/update-wish.dto';
+import { JwtGuard } from 'src/guards/jwt.guard';
+import { WishesService } from 'src/modules/wishes/wishes.service';
+import { CreateWishDto } from 'src/modules/wishes/dto/create-wish.dto';
+import { UpdateWishDto } from 'src/modules/wishes/dto/update-wish.dto';
 
 @Controller('wishes')
 export class WishesController {
@@ -20,7 +20,10 @@ export class WishesController {
 
   @UseGuards(JwtGuard)
   @Post()
-  async create(@Req() req, @Body() createWishDto: CreateWishDto) {
+  async create(
+    @Req() req: RequestWithUser,
+    @Body() createWishDto: CreateWishDto,
+  ) {
     try {
       return await this.wishesService.create({
         ...createWishDto,
@@ -33,8 +36,8 @@ export class WishesController {
 
   @UseGuards(JwtGuard)
   @Post(':id/copy')
-  async copy(@Param('id') id: string, @Req() req) {
-    return await this.wishesService.copyOne(Number(id), req.user.id);
+  async copy(@Param('id') id: string, @Req() req: RequestWithUser) {
+    return await this.wishesService.copyOne(Number(id), req.user);
   }
 
   @Get('last')

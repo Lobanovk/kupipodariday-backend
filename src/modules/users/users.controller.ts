@@ -9,10 +9,10 @@ import {
   UseGuards,
   NotFoundException,
 } from '@nestjs/common';
-import { JwtGuard } from '../../guards/jwt.guard';
-import { UsersService } from './users.service';
-import { UpdateUserDto } from './dto/update-user.dto';
-import { FindUserDto } from './dto/find-user.dto';
+import { JwtGuard } from 'src/guards/jwt.guard';
+import { UsersService } from 'src/modules/users/users.service';
+import { UpdateUserDto } from 'src/modules/users/dto/update-user.dto';
+import { FindUserDto } from 'src/modules/users/dto/find-user.dto';
 
 @Controller('users')
 @UseGuards(JwtGuard)
@@ -20,7 +20,7 @@ export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
   @Get('me')
-  async findMe(@Req() req) {
+  async findMe(@Req() req: RequestWithUser) {
     const user = await this.usersService.findOne(req.user.id);
 
     if (!user) {
@@ -33,7 +33,7 @@ export class UsersController {
   }
 
   @Patch('me')
-  async updateMe(@Req() req, @Body() updateUserDto: UpdateUserDto) {
+  async updateMe(@Req() req: RequestWithUser, @Body() updateUserDto: UpdateUserDto) {
     const user = await this.usersService.findOne(req.user.id);
 
     if (!user) {
@@ -44,7 +44,7 @@ export class UsersController {
   }
 
   @Get('me/wishes')
-  async findWishes(@Req() req) {
+  async findWishes(@Req() req: RequestWithUser) {
     return await this.usersService.findWishesById(req.user.id);
   }
 

@@ -9,10 +9,10 @@ import {
   Req,
   UseGuards,
 } from '@nestjs/common';
-import { WishlistsService } from './wishlists.service';
-import { JwtGuard } from '../../guards/jwt.guard';
-import { CreateWishlistDto } from './dto/create-wishlist.dto';
-import { UpdateWishlistDto } from './dto/update-wishlist.dto';
+import { JwtGuard } from 'src/guards/jwt.guard';
+import { WishlistsService } from 'src/modules/wishlists/wishlists.service';
+import { CreateWishlistDto } from 'src/modules/wishlists/dto/create-wishlist.dto';
+import { UpdateWishlistDto } from 'src/modules/wishlists/dto/update-wishlist.dto';
 
 @Controller('wishlists')
 @UseGuards(JwtGuard)
@@ -30,7 +30,7 @@ export class WishlistsController {
   }
 
   @Post()
-  async create(@Body() createWishlistDto: CreateWishlistDto, @Req() req) {
+  async create(@Body() createWishlistDto: CreateWishlistDto, @Req() req: RequestWithUser) {
     return await this.wishListsService.create({
       wishList: createWishlistDto,
       user: req.user,
