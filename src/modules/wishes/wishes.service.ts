@@ -1,9 +1,14 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  ConflictException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { FindManyOptions, Repository } from 'typeorm';
 import { Wish } from 'src/modules/wishes/entities/wish.entity';
 import { CreateWishDto } from 'src/modules/wishes/dto/create-wish.dto';
 import { UpdateWishDto } from 'src/modules/wishes/dto/update-wish.dto';
+import { User } from 'src/modules/users/entities/user.entity';
 
 @Injectable()
 export class WishesService {
@@ -11,45 +16,85 @@ export class WishesService {
     @InjectRepository(Wish) private wishRepository: Repository<Wish>,
   ) {}
 
-  async create(createWishDto: CreateWishDto & { owner: Wish['owner'] }) {
-    const user = this.wishRepository.create(createWishDto);
+  async create({
+    createWishDto,
+    user,
+  }: {
+    createWishDto: CreateWishDto;
+    user: User;
+  }) {
+    const wish = this.wishRepository.create({
+      ...createWishDto,
+      owner: user,
+    });
 
-    return await this.wishRepository.save(user);
+    return await this.wishRepository.save(wish);
   }
 
   async findOne(id: Wish['id']) {
     return await this.wishRepository.findOneBy({ id });
   }
 
-  async update(id: Wish['id'], updateWishDto: UpdateWishDto) {
-    /** TODO проверка на пользака и невозможность менять стоимость при offers.length > 0
-     * нет возможности менять raised руками, только исходя из общий заявок - сделать это в offers
-     * **/
-    await this.wishRepository.update(id, updateWishDto);
+  async update({
+    user,
+    updateWishDto,
+  }: {
+    updateWishDto: UpdateWishDto & { id: Wish['id'] };
+    user: User;
+  }) {
+    const wish = await this.wishRepository.findOne({
+      where: { id: updateWishDto.id },
+      relations: {
+        owner: true,
+        offers: true,
+      },
+    });
 
-    return await this.wishRepository.findOneBy({ id });
+    if (wish.owner.id !== user.id) {
+      throw new ConflictException(
+        'Вы не можете изменять информацию о чужих подарках',
+      );
+    }
+
+    if (wish.offers.length && updateWishDto.price !== wish.price) {
+      throw new ConflictException(
+        'Вы не можете изменять цену при созданных заявках на сбор',
+      );
+    }
+
+    await this.wishRepository.update(updateWishDto.id, updateWishDto);
+
+    return await this.wishRepository.findOneBy({ id: updateWishDto.id });
   }
 
-  async removeOne(id: Wish['id']) {
-    // TODO удаляешь только свои подарки
+  async removeOne({ id, user }: { id: Wish['id']; user: User }) {
+    const wish = await this.wishRepository.findOne({
+      where: { id },
+      relations: {
+        owner: true,
+      },
+    });
+
+    if (wish.owner.id !== user.id) {
+      throw new ConflictException('Вы не можете удалять чужие подарки');
+    }
+
     return await this.wishRepository.delete(id);
   }
 
-  async copyOne(id: Wish['id'], owner: Wish['owner']) {
-    // TODO проверка на пользака, нельзя копировать свое же
-    const wish = await this.wishRepository.findOne({
+  async copyOne({ id, user }: { id: Wish['id']; user: User }) {
+    const result = await this.wishRepository.findOne({
       where: { id },
-      select: {
-        name: true,
-        image: true,
-        link: true,
-        price: true,
-        raised: true,
-        description: true,
-        copied: true,
-        createdAt: true,
+      relations: {
+        owner: true,
       },
     });
+
+    const { id: _id, ...wish } = result;
+
+    if (wish.owner.id === user.id) {
+      throw new ConflictException('Вы не можете копировать свои подарки');
+    }
 
     if (!wish) {
       throw new NotFoundException('No wish found');
@@ -60,7 +105,14 @@ export class WishesService {
       copied: Number(wish.copied) + 1,
     });
 
-    return await this.create({ ...wish, owner: owner });
+    const newWish = this.wishRepository.create({
+      ...wish,
+      raised: 0,
+      copied: 0,
+      owner: user,
+    });
+
+    return await this.wishRepository.save(newWish);
   }
 
   async findLastCreated() {

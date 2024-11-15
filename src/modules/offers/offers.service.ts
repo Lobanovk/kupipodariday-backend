@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { ConflictException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Offer } from 'src/modules/offers/entities/offer.entity';
@@ -16,18 +16,37 @@ export class OffersService {
   ) {}
 
   async create({ offer, user }: { offer: CreateOfferDto; user: User }) {
-    // TODO проверка на то, что собранная будет меньше чем после создания заявки
-    // TODO на свои подарки нельзя скидыватся
+    const wish = await this.wishRepository.findOne({
+      where: {
+        id: offer.itemId,
+      },
+      relations: {
+        owner: true,
+        offers: true,
+      },
+    });
 
-    const currentWish = await this.wishRepository.findOneBy({
-      id: offer.itemId,
+    if (wish.owner.id === user.id) {
+      throw new ConflictException('Вы не можете скидываться на свои подарки');
+    }
+
+    const amount = wish.raised + offer.amount;
+
+    if (amount > wish.price) {
+      throw new ConflictException(
+        'Конечная сумма сбора превышает цену подарка',
+      );
+    }
+
+    await this.wishRepository.update(wish.id, {
+      raised: amount,
     });
 
     const preparedOfferData: Omit<Offer, 'id' | 'createdAt' | 'updatedAt'> = {
       user,
       amount: offer.amount,
       hidden: offer.hidden,
-      item: currentWish,
+      item: wish,
     };
 
     const newOffer = this.offerRepository.create(preparedOfferData);

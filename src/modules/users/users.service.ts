@@ -13,11 +13,19 @@ export class UsersService {
   ) {}
 
   async findOne(id: User['id']) {
-    return await this.userRepository.findOneBy({ id });
+    const result = await this.userRepository.findOneBy({ id });
+
+    const { password, ...user } = result;
+
+    return user;
   }
 
   async findByUsername(username: User['username']) {
-    return await this.userRepository.findOneBy({ username });
+    const result = await this.userRepository.findOneBy({ username });
+
+    const { password, ...user } = result;
+
+    return user;
   }
 
   async findByUsernameOrEmail(value: User['username'] | User['email']) {
@@ -43,11 +51,11 @@ export class UsersService {
     }
 
     await this.userRepository.update(id, updateUserDto);
-    const user = await this.userRepository.findOneBy({ id });
+    const result = await this.userRepository.findOneBy({ id });
 
-    const { password, ...result } = user;
+    const { password, ...user } = result;
 
-    return result;
+    return user;
   }
 
   async findWishesById(id: User['id']) {

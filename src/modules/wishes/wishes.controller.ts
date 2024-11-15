@@ -24,20 +24,19 @@ export class WishesController {
     @Req() req: RequestWithUser,
     @Body() createWishDto: CreateWishDto,
   ) {
-    try {
-      return await this.wishesService.create({
-        ...createWishDto,
-        owner: req.user,
-      });
-    } catch (e) {
-      throw new Error(e);
-    }
+    return await this.wishesService.create({
+      createWishDto,
+      user: req.user,
+    });
   }
 
   @UseGuards(JwtGuard)
   @Post(':id/copy')
   async copy(@Param('id') id: string, @Req() req: RequestWithUser) {
-    return await this.wishesService.copyOne(Number(id), req.user);
+    return await this.wishesService.copyOne({
+      id: Number(id),
+      user: req.user,
+    });
   }
 
   @Get('last')
@@ -53,30 +52,28 @@ export class WishesController {
   @UseGuards(JwtGuard)
   @Get(':id')
   async findOne(@Param('id') id: string) {
-    try {
-      return await this.wishesService.findOne(Number(id));
-    } catch (e) {
-      throw new Error(e);
-    }
+    return await this.wishesService.findOne(Number(id));
   }
 
   @UseGuards(JwtGuard)
   @Patch(':id')
-  async patch(@Param('id') id: string, @Body() updateWishDto: UpdateWishDto) {
-    try {
-      return await this.wishesService.update(Number(id), updateWishDto);
-    } catch (e) {
-      throw new Error(e);
-    }
+  async patch(
+    @Param('id') id: string,
+    @Body() updateWishDto: UpdateWishDto,
+    @Req() req: RequestWithUser,
+  ) {
+    return await this.wishesService.update({
+      user: req.user,
+      updateWishDto: { ...updateWishDto, id: Number(id) },
+    });
   }
 
   @UseGuards(JwtGuard)
   @Delete(':id')
-  async delete(@Param('id') id: string) {
-    try {
-      return await this.wishesService.removeOne(Number(id));
-    } catch (e) {
-      throw new Error(e);
-    }
+  async delete(@Param('id') id: string, @Req() req: RequestWithUser) {
+    return await this.wishesService.removeOne({
+      id: Number(id),
+      user: req.user,
+    });
   }
 }

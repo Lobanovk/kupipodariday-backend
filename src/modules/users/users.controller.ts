@@ -27,13 +27,14 @@ export class UsersController {
       throw new NotFoundException();
     }
 
-    const { password, ...result } = user;
-
-    return result;
+    return user;
   }
 
   @Patch('me')
-  async updateMe(@Req() req: RequestWithUser, @Body() updateUserDto: UpdateUserDto) {
+  async updateMe(
+    @Req() req: RequestWithUser,
+    @Body() updateUserDto: UpdateUserDto,
+  ) {
     const user = await this.usersService.findOne(req.user.id);
 
     if (!user) {
@@ -56,9 +57,7 @@ export class UsersController {
       throw new NotFoundException();
     }
 
-    const { password, ...result } = user;
-
-    return result;
+    return user;
   }
 
   @Get(':username/wishes')

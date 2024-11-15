@@ -30,7 +30,10 @@ export class WishlistsController {
   }
 
   @Post()
-  async create(@Body() createWishlistDto: CreateWishlistDto, @Req() req: RequestWithUser) {
+  async create(
+    @Body() createWishlistDto: CreateWishlistDto,
+    @Req() req: RequestWithUser,
+  ) {
     return await this.wishListsService.create({
       wishList: createWishlistDto,
       user: req.user,
