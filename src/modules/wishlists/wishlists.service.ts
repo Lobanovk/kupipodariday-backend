@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { ConflictException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Wishlist } from 'src/modules/wishlists/entities/wishlist.entity';
@@ -14,6 +14,28 @@ export class WishlistsService {
     private wishListRepository: Repository<Wishlist>,
     @InjectRepository(Wish) private wishRepository: Repository<Wish>,
   ) {}
+
+  private async checkWishListByUser(
+    {
+      wishListId,
+      userId,
+    }: {
+      wishListId: Wishlist['id'];
+      userId: User['id'];
+    },
+    errorMessage = 'Вы не можете изменять чужие wishlist',
+  ) {
+    const wishList = await this.wishListRepository.findOne({
+      where: { id: wishListId },
+      relations: {
+        owner: true,
+      },
+    });
+
+    if (wishList?.owner?.id !== userId) {
+      throw new ConflictException(errorMessage);
+    }
+  }
 
   async findAll() {
     return await this.wishListRepository.find({
@@ -55,13 +77,27 @@ export class WishlistsService {
     return await this.wishListRepository.save(newWishlist);
   }
 
-  async update(id: Wishlist['id'], updateWishListDto: UpdateWishlistDto) {
+  async update({
+    id,
+    updateWishListDto,
+    user,
+  }: {
+    id: Wishlist['id'];
+    updateWishListDto: UpdateWishlistDto;
+    user: User;
+  }) {
+    await this.checkWishListByUser({ wishListId: id, userId: user.id });
+
     await this.wishListRepository.update(id, updateWishListDto);
 
     return await this.wishListRepository.findOneBy({ id });
   }
 
-  async removeOne(id: Wishlist['id']) {
+  async removeOne({ id, user }: { id: Wishlist['id']; user: User }) {
+    await this.checkWishListByUser(
+      { wishListId: id, userId: user.id },
+      'Вы не можете удалять чужие wishlist',
+    );
     return await this.wishListRepository.delete(id);
   }
 }

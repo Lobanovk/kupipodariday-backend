@@ -7,7 +7,6 @@ import {
   Param,
   Req,
   UseGuards,
-  NotFoundException,
 } from '@nestjs/common';
 import { JwtGuard } from 'src/guards/jwt.guard';
 import { UsersService } from 'src/modules/users/users.service';
@@ -21,13 +20,7 @@ export class UsersController {
 
   @Get('me')
   async findMe(@Req() req: RequestWithUser) {
-    const user = await this.usersService.findOne(req.user.id);
-
-    if (!user) {
-      throw new NotFoundException();
-    }
-
-    return user;
+    return await this.usersService.findOne(req.user.id);
   }
 
   @Patch('me')
@@ -36,10 +29,6 @@ export class UsersController {
     @Body() updateUserDto: UpdateUserDto,
   ) {
     const user = await this.usersService.findOne(req.user.id);
-
-    if (!user) {
-      throw new NotFoundException();
-    }
 
     return await this.usersService.update(user.id, updateUserDto);
   }
@@ -53,11 +42,9 @@ export class UsersController {
   async findUser(@Param('username') username: string) {
     const user = await this.usersService.findByUsername(username);
 
-    if (!user) {
-      throw new NotFoundException();
-    }
+    const { password, ...result } = user;
 
-    return user;
+    return result;
   }
 
   @Get(':username/wishes')
@@ -66,7 +53,7 @@ export class UsersController {
   }
 
   @Post('find')
-  async create(@Body() findUserDto: FindUserDto) {
-    return await this.usersService.findByUsernameOrEmail(findUserDto.query);
+  async find(@Body() findUserDto: FindUserDto) {
+    return await this.usersService.findByQuery(findUserDto.query);
   }
 }

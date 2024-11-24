@@ -44,12 +44,20 @@ export class WishlistsController {
   async updateOne(
     @Param('id') id: string,
     @Body() updateWishlistDto: UpdateWishlistDto,
+    @Req() req: RequestWithUser,
   ) {
-    return await this.wishListsService.update(Number(id), updateWishlistDto);
+    return await this.wishListsService.update({
+      id: Number(id),
+      updateWishListDto: updateWishlistDto,
+      user: req.user,
+    });
   }
 
   @Delete(':id')
-  async removeOne(@Param('id') id: string) {
-    return await this.wishListsService.removeOne(Number(id));
+  async removeOne(@Param('id') id: string, @Req() req: RequestWithUser) {
+    return await this.wishListsService.removeOne({
+      id: Number(id),
+      user: req.user,
+    });
   }
 }
