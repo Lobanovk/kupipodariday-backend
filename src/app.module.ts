@@ -1,5 +1,6 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 import { AppController } from 'src/app.controller';
 import { User } from 'src/modules/users/entities/user.entity';
 import { Offer } from 'src/modules/offers/entities/offer.entity';
@@ -11,17 +12,21 @@ import { OffersModule } from 'src/modules/offers/offers.module';
 import { UsersModule } from 'src/modules/users/users.module';
 import { AuthModule } from 'src/modules/auth/auth.module';
 
+import configuration from '../configs/configuration';
+
 @Module({
   imports: [
-    TypeOrmModule.forRoot({
-      type: 'postgres',
-      host: 'localhost',
-      port: 5432,
-      username: 'student',
-      password: 'student',
-      database: 'kupipodariday',
-      entities: [User, Offer, Wish, Wishlist],
-      synchronize: true,
+    ConfigModule.forRoot({
+      isGlobal: true,
+      load: [configuration],
+    }),
+    TypeOrmModule.forRootAsync({
+      inject: [ConfigService],
+      useFactory: async (configService: ConfigService) => ({
+        ...configService.get('database'),
+        entities: [User, Offer, Wish, Wishlist],
+        synchronize: true,
+      }),
     }),
     WishesModule,
     WishlistsModule,
