@@ -98,7 +98,6 @@ export class UsersService {
 
       return await this.userRepository.save(user);
     } catch (error) {
-      console.error(error);
       if (error instanceof QueryFailedError) {
         const err = error.driverError;
 
